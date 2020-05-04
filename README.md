@@ -20,16 +20,32 @@ This sort of UI is specially useful when you would like to create a reactive app
 |---|---|---|
 |![Simulator Screen Shot - iPhone 11 Pro - 2020-04-30 at 17 30 12](https://user-images.githubusercontent.com/8016341/80722790-7197e280-8b08-11ea-90ab-f30fcff6e6fb.png)|![Simulator Screen Shot - iPhone 11 Pro - 2020-04-30 at 17 30 16](https://user-images.githubusercontent.com/8016341/80722791-72307900-8b08-11ea-872a-3a2292ded075.png)|![Simulator Screen Shot - iPhone 11 Pro - 2020-04-30 at 17 30 22](https://user-images.githubusercontent.com/8016341/80722792-72c90f80-8b08-11ea-97c4-3270efd12d80.png)|
 
-Usage
+Setup
 
-Create a custom transition delegate and present the view controller
+In the initializer of the view controller add the following
+
 ```
-        transitionDelegate = DraggableTransitionDelegate()
-        let vc = YourViewController()
-        vc.transitioningDelegate = transitionDelegate
-        vc.modalPresentationStyle = .custom
-        vc.selectionDelegate = self
-        present(vc, animated: true)
+init() {
+        super.init(nibName: .none, bundle: .none)
+        transitioningDelegate = self
+        modalPresentationStyle = .custom
+    }
+```
+
+Make your view controller conform to `UIViewControllerTransitioningDelegate` 
+
+```
+extension SelectCurrencyViewController: UIViewControllerTransitioningDelegate {
+    func presentationController(
+        forPresented presented: UIViewController,
+        presenting: UIViewController?, source: UIViewController
+    ) -> UIPresentationController? {
+        DraggablePresentationController(
+            presentedViewController: presented,
+            presenting: source
+        )
+    }
+}
 ```
 
 Make sure your view controller conforms to `KeyboardDismissableDraggableView`
@@ -41,12 +57,15 @@ extension YourViewController: KeyboardDismissableDraggableView {
     }
          
     func handleInteraction(enabled: Bool) {
-         [tableView, searchBar].forEach {
-            $0.isUserInteractionEnabled = enabled
-        }
+         tableView.isUserInteractionEnabled = enabled
     }
     
     func dismissKeyboard() {
+        // It gives you a opportunity to dismiss the keyboard 
+        // if the keyboard is presented on the screen
+        // When the view is dragged down from `open` state to `mid`
+        // state, we would like to dismiss the keyboard
+        // Eg ⬇️
         guard searchBar.isFirstResponder else { return }
         searchBar.resignFirstResponder()
     }
