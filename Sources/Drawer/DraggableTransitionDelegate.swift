@@ -61,7 +61,7 @@ private enum DraggablePosition {
     }
 }
 
-private final class DraggablePresentationController: UIPresentationController {
+public final class DraggablePresentationController: UIPresentationController {
 
     private var draggableViewController: KeyboardDismissableDraggableView {
         guard let presentedViewController = presentedViewController as?  KeyboardDismissableDraggableView else {
@@ -101,7 +101,7 @@ private final class DraggablePresentationController: UIPresentationController {
     private var containerViewGestureRecognizer = UITapGestureRecognizer()
     private var presentedViewGestureDelegate: PresentedViewGestureDelegate?
     
-    override var frameOfPresentedViewInContainerView: CGRect {
+    override public var frameOfPresentedViewInContainerView: CGRect {
         let yOrigin = draggablePosition.yOrigin(for: maxFrame.height)
         let presentedViewOrigin = CGPoint(x: 0, y: yOrigin)
         let presentedViewSize = CGSize(
@@ -111,15 +111,15 @@ private final class DraggablePresentationController: UIPresentationController {
         return CGRect(origin: presentedViewOrigin, size: presentedViewSize)
     }
 
-    override func containerViewDidLayoutSubviews() {
+    override public func containerViewDidLayoutSubviews() {
         presentedView?.frame = frameOfPresentedViewInContainerView
     }
 
-    override func presentationTransitionWillBegin() {
+    override public func presentationTransitionWillBegin() {
         draggableViewController.handleInteraction(enabled: true)
     }
 
-    override func presentationTransitionDidEnd(_ completed: Bool) {
+    override public func presentationTransitionDidEnd(_ completed: Bool) {
         animator = UIViewPropertyAnimator(
             duration: .animationDuration,
             curve: .easeInOut
@@ -232,7 +232,7 @@ private final class DraggablePresentationController: UIPresentationController {
 }
 
 extension DraggablePresentationController: UIGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         let touchPoint = touch.location(in: presentedView)
         return presentedView?.bounds.contains(touchPoint) == false
     }
